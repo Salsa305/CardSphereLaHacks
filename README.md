@@ -94,10 +94,6 @@ npm run dev
 - 🔄 Advanced DeFi integration
 - 🔄 Comprehensive vendor dashboard
 
-## Team
-
-- **Alan Goodjob** - Founder & Lead Developer
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

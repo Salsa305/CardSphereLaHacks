@@ -4,6 +4,9 @@
 /.pnp
 .pnp.js
 
+# specific paths to ignore
+cardsphere/frontend/node_modules/@next/swc-darwin-arm64
+
 # testing
 /coverage
 

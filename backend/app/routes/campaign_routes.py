@@ -4,28 +4,26 @@ from fastapi.responses import JSONResponse
 from schemas.user import user_name
 
 
-# /auth/register, /auth/login, /auth/connect-wallet
-
+# Method	Endpoint	Purpose
+# GET	/profile	Get user profile
+# PUT	/profile	Update name, contact info, etc.
 
 router = APIRouter()
 
-# @router.get("/profile")
-# def register(email: str, name: str, user_name: list, password: str, isVendor: bool):
-#     user = {
-#         "id": len(user_name) + 1,
-#         "name": name,
-#         "password": password,
-#         "isVendor": isVendor,
-#         "email": email,
-#         "giftCardOwned": [],
-#     }
-#     user_name.append(user)
-#     return JSONResponse(status_code=200, content={"message": "User registered successfully", "user": user})
+@router.get("/profile")
+def get_profile(email: str):
+    for user in user_name:
+        if user["email"] == email:
+            return JSONResponse(status_code=200, content={"message": "User profile retrieved successfully", "user": user})
+    raise HTTPException(status_code=404, detail="User not found")
 
 
-# @router.post("/profile")
-# def login(username: str, password: str):
-#     for user in user_name:
-#         if user["name"] == username and user["password"] == password:
-#             return JSONResponse(status_code=200, content={"message": "Login successful", "user": user})
-#     raise HTTPException(status_code=401, detail="Invalid username or password")
+@router.put("/profile")
+def update_profile(name: str, email: str, password: str):
+    for user in user_name:
+        if user["email"] == email:
+            user["name"] = name
+            user["password"] = password
+            return JSONResponse(status_code=200, content={"message": "User profile updated successfully", "user": user})
+    raise HTTPException(status_code=404, detail="User not found")
+    

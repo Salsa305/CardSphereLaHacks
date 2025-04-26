@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from schemas.user import user_name
 
 
-# /auth/register, /auth/login, /auth/connect-wallet
-
+# Method	Endpoint	Purpose
+# POST	/redeem	Redeem a gift card via QR or NFC scan
 
 router = APIRouter()
 
@@ -29,14 +29,4 @@ def put_giftcards(email: str, card_code: str, balance: float, active: bool):
             return JSONResponse(status_code=200, content={"message": "Gift card added successfully", "gift_cards": card})
     raise HTTPException(status_code=404, detail="No gift cards found for this email")
 
-
-@router.post("/giftcards/scan")
-def put_giftcards(email: str, card_code: str, balance: float, active: bool):
-    pass
     
-@router.get("/giftcards/{card_id}")
-def get_giftcard(card_id: int):
-    for card in gift_cards:
-        if card["id"] == card_id:
-            return JSONResponse(status_code=200, content={"message": "Gift card retrieved successfully", "gift_card": card})
-    raise HTTPException(status_code=404, detail="Gift card not found")

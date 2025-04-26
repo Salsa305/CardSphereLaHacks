@@ -3,8 +3,10 @@ from fastapi.responses import JSONResponse
 from schemas.user import user_name
 
 
-# /auth/register, /auth/login, /auth/connect-wallet
-
+# Method	Endpoint	Purpose
+# POST	/auth/register	Register a new user account (email, password)
+# POST	/auth/login	Login user and get JWT token
+# POST	/auth/connect-wallet	Connect Ethereum wallet address
 
 router = APIRouter()
 
@@ -17,6 +19,7 @@ def register(email: str, name: str, user_name: list, password: str, isVendor: bo
         "isVendor": isVendor,
         "email": email,
         "giftCardOwned": [],
+        "history": [],
     }
     user_name.append(user)
     return JSONResponse(status_code=200, content={"message": "User registered successfully", "user": user})

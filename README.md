@@ -1,6 +1,7 @@
 # CardSphere
 
-![CardSphere Logo]([https://via.placeholder.com/150x150?text=CardSphere](https://cdn.discordapp.com/attachments/1365532477111930993/1365807546220417034/ChatGPT_Image_Apr_25_2025_05_25_42_PM.png?ex=680ea6e6&is=680d5566&hm=d9a1dacad744a7419642d0ae3ca007d825055a495c6e924825fe1b3d06e0497f&))
+![ChatGPT Image Apr 25, 2025, 05_25_42 PM](https://github.com/user-attachments/assets/e1b93607-ec89-48ec-bf5c-67a4ad64733c)
+
 
 ## Overview
 

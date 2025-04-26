@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { EthService } from '../services/ethService';
+import { ethers } from 'ethers';
 
 const ethService = new EthService();
 const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Sepolia testnet chain ID
@@ -14,6 +15,7 @@ export function GiftCardSender() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSepolia, setIsSepolia] = useState(false);
+  const [ethAmount, setEthAmount] = useState<string | null>(null);
 
   useEffect(() => {
     const checkNetwork = async () => {
@@ -37,6 +39,25 @@ export function GiftCardSender() {
       });
     }
   }, []);
+
+  // Calculate ETH amount when USD amount changes
+  useEffect(() => {
+    const calculateEthAmount = async () => {
+      if (usdAmount && !isNaN(Number(usdAmount)) && Number(usdAmount) > 0) {
+        try {
+          const ethValue = await ethService.usdToEth(Number(usdAmount));
+          setEthAmount(ethValue);
+        } catch (err) {
+          console.error('Error calculating ETH amount:', err);
+          setEthAmount(null);
+        }
+      } else {
+        setEthAmount(null);
+      }
+    };
+
+    calculateEthAmount();
+  }, [usdAmount]);
 
   const switchToSepolia = async () => {
     if (typeof window.ethereum === 'undefined') {
@@ -93,16 +114,26 @@ export function GiftCardSender() {
       return;
     }
 
+    if (!ethAmount) {
+      setError('Failed to calculate ETH amount. Please try again.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const ethAmount = await ethService.usdToEth(Number(usdAmount));
+      console.log('Sending transaction with params:', {
+        to: recipientAddress,
+        value: ethAmount,
+        from: address
+      });
       
       // Create the transaction
       const transaction = {
         to: recipientAddress,
         value: ethAmount,
+        from: address
       };
 
       // Send the transaction using MetaMask
@@ -115,9 +146,20 @@ export function GiftCardSender() {
       // Clear form
       setRecipientAddress('');
       setUsdAmount('');
-    } catch (err) {
+      setEthAmount(null);
+    } catch (err: any) {
       console.error('Error sending gift card:', err);
-      setError('Failed to send gift card. Please try again.');
+      let errorMessage = 'Failed to send gift card. Please try again.';
+      
+      if (err.code === 4001) {
+        errorMessage = 'Transaction rejected by user.';
+      } else if (err.code === -32603) {
+        errorMessage = 'Insufficient funds for transaction.';
+      } else if (err.message) {
+        errorMessage = `Error: ${err.message}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -169,15 +211,20 @@ export function GiftCardSender() {
             step="0.01"
             required
           />
+          {ethAmount && (
+            <p className="mt-1 text-sm text-gray-500">
+              This will send approximately {ethers.formatEther(ethAmount)} ETH
+            </p>
+          )}
         </div>
         {error && (
           <div className="text-red-600 text-sm">{error}</div>
         )}
         <button
           type="submit"
-          disabled={loading || !isConnected || !isSepolia}
+          disabled={loading || !isConnected || !isSepolia || !ethAmount}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-            ${loading || !isConnected || !isSepolia
+            ${loading || !isConnected || !isSepolia || !ethAmount
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
             }`}

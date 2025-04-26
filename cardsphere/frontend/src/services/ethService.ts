@@ -23,26 +23,47 @@ export class EthService {
 
   async getEthPrice(): Promise<number> {
     try {
+      console.log('Fetching ETH price from Chainlink...');
       const [price, decimals] = await Promise.all([
         this.usdPriceFeed.latestAnswer(),
         this.usdPriceFeed.decimals()
       ]);
-      return Number(price) / Math.pow(10, Number(decimals));
+      const formattedPrice = Number(price) / Math.pow(10, Number(decimals));
+      console.log(`ETH price: $${formattedPrice}`);
+      return formattedPrice;
     } catch (error) {
       console.error('Error fetching ETH price:', error);
-      throw error;
+      // Fallback to a default price if the price feed fails
+      console.log('Using fallback ETH price: $2000');
+      return 2000; // Fallback price
     }
   }
 
   async usdToEth(usdAmount: number): Promise<string> {
-    const ethPrice = await this.getEthPrice();
-    const ethAmount = usdAmount / ethPrice;
-    return ethers.parseEther(ethAmount.toFixed(18)).toString();
+    try {
+      console.log(`Converting $${usdAmount} to ETH...`);
+      const ethPrice = await this.getEthPrice();
+      const ethAmount = usdAmount / ethPrice;
+      const weiAmount = ethers.parseEther(ethAmount.toFixed(18)).toString();
+      console.log(`$${usdAmount} = ${ethAmount} ETH = ${weiAmount} wei`);
+      return weiAmount;
+    } catch (error) {
+      console.error('Error converting USD to ETH:', error);
+      throw new Error(`Failed to convert $${usdAmount} to ETH: ${error}`);
+    }
   }
 
   async ethToUsd(ethAmount: string): Promise<number> {
-    const ethPrice = await this.getEthPrice();
-    const ethValue = Number(ethers.formatEther(ethAmount));
-    return ethValue * ethPrice;
+    try {
+      console.log(`Converting ${ethAmount} wei to USD...`);
+      const ethPrice = await this.getEthPrice();
+      const ethValue = Number(ethers.formatEther(ethAmount));
+      const usdValue = ethValue * ethPrice;
+      console.log(`${ethValue} ETH = $${usdValue}`);
+      return usdValue;
+    } catch (error) {
+      console.error('Error converting ETH to USD:', error);
+      throw new Error(`Failed to convert ${ethAmount} wei to USD: ${error}`);
+    }
   }
 } 

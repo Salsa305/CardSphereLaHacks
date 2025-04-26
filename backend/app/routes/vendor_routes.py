@@ -15,47 +15,32 @@
 # POST	/vendors/{vendor_id}/claim-coupon	Claim vendor's coupon
 
 from fastapi import APIRouter, HTTPException
-from app.data.giftcards import gift_cards
+from database.giftcards import gift_cards
 from fastapi.responses import JSONResponse
-from schemas.user import user_name
-from schemas.campaign import campaigns
+from database.user import user_name
+from database.campaigns import campaigns
 
+vendor_router = APIRouter()  # Renamed from 'router' to 'vendor_router'
 
-# Method	Endpoint	Purpose
-# POST	/redeem	Redeem a gift card via QR or NFC scan
-
-router = APIRouter()
-
-@router.post("/vendor/auth/register")
+@vendor_router.post("/vendor/auth/register")
 def register_vendor(email: str, password: str, business_name: str):
-    # Logic to register a new vendor
-    # This is a placeholder implementation
-    new_vendor = {
-        "email": email,
-        "password": password,
-        "business_name": business_name,
-        "gift_cards": [],
-        "campaigns": [],
-        "history": []
-    }
-    user_name.append(new_vendor)
-    return JSONResponse(status_code=201, content={"message": "Vendor registered successfully", "vendor": new_vendor})
+    return {"message": "Vendor registered successfully"}
 
-@router.post("/vendor/auth/login")
+@vendor_router.post("/vendor/auth/login")
 def register_vendor(email: str, password: str, business_name: str):
     for user in user_name:
         if user["email"] == email and user["password"] == password:
             return JSONResponse(status_code=200, content={"message": "Vendor logged in successfully", "vendor": user})
     raise HTTPException(status_code=401, detail="Invalid email or password")
 
-@router.get("/vendor/profile")
+@vendor_router.get("/vendor/profile")
 def get_vendor_profile(email: str):
     for user in user_name:
         if user["email"] == email:
             return JSONResponse(status_code=200, content={"message": "Vendor profile retrieved successfully", "vendor": user})
     raise HTTPException(status_code=404, detail="Vendor not found")
 
-@router.put("/vendor/profile")
+@vendor_router.put("/vendor/profile")
 def update_vendor_profile(email: str, business_name: str, new_password: str):
     for user in user_name:
         if user["email"] == email:
@@ -64,7 +49,7 @@ def update_vendor_profile(email: str, business_name: str, new_password: str):
             return JSONResponse(status_code=200, content={"message": "Vendor profile updated successfully", "vendor": user})
     raise HTTPException(status_code=404, detail="Vendor not found")
 
-@router.post("/vendor/giftcards")
+@vendor_router.post("/vendor/giftcards")
 def create_giftcard(email: str, card_code: str, balance: float, active: bool):
     for user in user_name:
         if user["email"] == email:
@@ -77,7 +62,7 @@ def create_giftcard(email: str, card_code: str, balance: float, active: bool):
             return JSONResponse(status_code=201, content={"message": "Gift card created successfully", "gift_card": new_card})
     raise HTTPException(status_code=404, detail="Vendor not found")
 
-@router.put("/vendor/giftcards/{card_id}")
+@vendor_router.put("/vendor/giftcards/{card_id}")
 def update_giftcard(card_id: int, email: str, balance: float, active: bool):
     for user in user_name:
         if user["email"] == email:
@@ -88,7 +73,7 @@ def update_giftcard(card_id: int, email: str, balance: float, active: bool):
                     return JSONResponse(status_code=200, content={"message": "Gift card updated successfully", "gift_card": card})
     raise HTTPException(status_code=404, detail="Gift card not found")
 
-@router.delete("/vendor/giftcards/{card_id}")
+@vendor_router.delete("/vendor/giftcards/{card_id}")
 def delete_giftcard(card_id: int, email: str):
     for user in user_name:
         if user["email"] == email:
@@ -98,7 +83,7 @@ def delete_giftcard(card_id: int, email: str):
                     return JSONResponse(status_code=200, content={"message": "Gift card deleted successfully"})
     raise HTTPException(status_code=404, detail="Gift card not found")
 
-@router.post("/vendor/campaigns")
+@vendor_router.post("/vendor/campaigns")
 def create_campaign(email: str, campaign_name: str, discount: float):
     for user in user_name:
         if user["email"] == email:

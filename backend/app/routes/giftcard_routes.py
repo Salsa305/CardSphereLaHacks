@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from app.data.giftcards import gift_cards
+from database.giftcards import gift_cards
 from fastapi.responses import JSONResponse
-from schemas.user import user_name
+from database.user import user_name
 from datetime import datetime
 
 # Method	Endpoint	Purpose
@@ -12,17 +12,16 @@ from datetime import datetime
 # DELETE	/giftcards/{card_id}	Delete a card (optional)
 # POST	/giftcards/{card_id}/transfer	Send/gift a card to another user
 
+giftcard_router = APIRouter()  # Renamed from 'router' to 'giftcard_router'
 
-router = APIRouter()
-
-@router.get("/giftcards")
+@giftcard_router.get("/giftcards")
 def get_cards_owned(email: str):
     for user in user_name:
         if user["email"] == email:
-            return JSONResponse(status_code=200, content={"message": "Gift cards retrieved successfully", "gift_cards": card["giftCardOwned"]})
+            return JSONResponse(status_code=200, content={"message": "Gift cards retrieved successfully", "gift_cards": user["giftCardOwned"]})
     raise HTTPException(status_code=404, detail="No gift cards found for this email")
 
-@router.post("/giftcards")
+@giftcard_router.post("/giftcards")
 def add_card(card_code: str, balance: float, active: bool, email: str):
     for user in user_name:
         if user["email"] == email:
@@ -32,17 +31,17 @@ def add_card(card_code: str, balance: float, active: bool, email: str):
                 "active": active
             }
             user["giftCardOwned"].append(new_card)
-            return JSONResponse(status_code=200, content={"message": "Gift card added successfully", "gift_cards": user["giftCardOwned"]})
-    raise HTTPException(status_code=404, detail="No gift cards found for this email")
+            return JSONResponse(status_code=201, content={"message": "Gift card added successfully", "gift_card": new_card})
+    raise HTTPException(status_code=404, detail="User not found")
 
-@router.get("/giftcards/{card_id}")
+@giftcard_router.get("/giftcards/{card_id}")
 def get_giftcard(card_id: int):
     for card in gift_cards:
         if card == card_id:
             return JSONResponse(status_code=200, content={"message": "Gift card retrieved successfully", "gift_card": card})
     raise HTTPException(status_code=404, detail="Gift card not found")
 
-@router.post("/giftcaards/{card_id}/transfer")
+@giftcard_router.post("/giftcaards/{card_id}/transfer")
 def transfer_giftcard(card_id: int, email_sender: str, recipient_email: str):
     card = None
     user_send = None
@@ -57,15 +56,16 @@ def transfer_giftcard(card_id: int, email_sender: str, recipient_email: str):
         if user["email"] == email_sender:
             user_send = user
             user["giftCardOwned"].remove(card)
+            user["user_balance"] += card["balance"]
             user["history"].append({"card": card, "action": "transferred","time": datetime.now()})
             break
     for user in user_name:
         if user["email"] == recipient_email:
             user["giftCardOwned"].append(card)
+            user["user_balance"] -= card["balance"]
             user["history"].append({"card": card, "action": "received","vendor":user,"time": datetime.now()})
             return JSONResponse(status_code=200, content={"message": "Gift card transferred successfully", "gift_card": card})
     raise HTTPException(status_code=404, detail="Recipient not found")
-            
 
 
-    
+

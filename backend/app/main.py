@@ -1,15 +1,11 @@
 from fastapi import FastAPI
-from CardSphereLaHacks.backend.app.utils.database import engine
-from app import models
+import models
 from app.routes.profile_routes import profile_router
 from app.routes.vendor_routes import vendor_router
 from app.routes.campaign_routes import campaign_router
 from app.routes.giftcard_routes import giftcard_router
 from app.routes.auth_routes import auth_router
 from app.routes.security import security_router
-
-
-models.Base.metadata.create_all(bind=engine)  # Creates tables if not exists
 
 app = FastAPI()
 

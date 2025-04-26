@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from app.data.giftcards import gift_cards
+from database.giftcards import gift_cards
 from fastapi.responses import JSONResponse
-from schemas.user import user_name
+from database.user import user_name
 
 
 # Method	Endpoint	Purpose

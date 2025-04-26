@@ -1,23 +1,23 @@
 'use client';
 
-import * as React from 'react';
+import { useCustomState, useCustomCallback, useCustomEffect } from '../hooks/useCustomState';
 import { useGiftCard } from '../hooks/useGiftCard';
 import { GiftCard } from './GiftCard';
 
-export const GiftCardList: React.FC = () => {
+export const GiftCardList = () => {
   const { getGiftCards, createGiftCard, loading, error } = useGiftCard();
-  const [giftCards, setGiftCards] = React.useState<any[]>([]);
-  const [showCreateForm, setShowCreateForm] = React.useState(false);
-  const [amount, setAmount] = React.useState('');
-  const [ownerAddress, setOwnerAddress] = React.useState('');
+  const [giftCards, setGiftCards] = useCustomState<any[]>([]);
+  const [showCreateForm, setShowCreateForm] = useCustomState<boolean>(false);
+  const [amount, setAmount] = useCustomState<string>('');
+  const [ownerAddress, setOwnerAddress] = useCustomState<string>('');
 
-  const loadGiftCards = React.useCallback(async () => {
+  const loadGiftCards = useCustomCallback(async () => {
     if (!ownerAddress) return;
     const cards = await getGiftCards(ownerAddress);
     setGiftCards(cards);
   }, [ownerAddress, getGiftCards]);
 
-  React.useEffect(() => {
+  useCustomEffect(() => {
     loadGiftCards();
   }, [loadGiftCards]);
 

@@ -1,11 +1,11 @@
-import * as React from 'react';
+import { useCustomState, useCustomCallback } from './useCustomState';
 import { giftCardService } from '../lib/giftCardService';
 
 export const useGiftCard = () => {
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = useCustomState<boolean>(false);
+  const [error, setError] = useCustomState<string | null>(null);
 
-  const createGiftCard = React.useCallback(async (owner: string, amount: number) => {
+  const createGiftCard = useCustomCallback(async (owner: string, amount: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -19,7 +19,7 @@ export const useGiftCard = () => {
     }
   }, []);
 
-  const getGiftCards = React.useCallback(async (owner: string) => {
+  const getGiftCards = useCustomCallback(async (owner: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -33,7 +33,7 @@ export const useGiftCard = () => {
     }
   }, []);
 
-  const transferGiftCard = React.useCallback(async (id: string, from: string, to: string) => {
+  const transferGiftCard = useCustomCallback(async (id: string, from: string, to: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -47,7 +47,7 @@ export const useGiftCard = () => {
     }
   }, []);
 
-  const redeemGiftCard = React.useCallback(async (id: string, owner: string) => {
+  const redeemGiftCard = useCustomCallback(async (id: string, owner: string) => {
     setLoading(true);
     setError(null);
     try {

@@ -3,11 +3,6 @@
 import * as React from 'react';
 import { WalletProvider } from '../contexts/WalletContext';
 
-export const metadata = {
-  title: 'CardSphere',
-  description: 'Manage your gift cards on the blockchain',
-}
-
 export default function RootLayout({
   children,
 }: {

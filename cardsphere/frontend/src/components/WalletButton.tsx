@@ -4,14 +4,19 @@ import React from 'react';
 import { useWallet } from '../contexts/WalletContext';
 
 export function WalletButton() {
-  const { address, connect, isConnected } = useWallet();
+  const { address, connect, isConnected, error } = useWallet();
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center gap-2">
+      {error && (
+        <div className="text-sm text-red-500 mb-2">
+          {error}
+        </div>
+      )}
       {isConnected && address ? (
         <div className="text-sm font-medium">
           Connected: {formatAddress(address)}
